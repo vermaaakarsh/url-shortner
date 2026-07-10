@@ -1,5 +1,7 @@
 export const ENV = {
   PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV ?? "development",
+  LOG_LEVEL: process.env.LOG_LEVEL ?? "debug",
   URL_DB_URI: process.env.URL_DB_URI ?? "",
   TOKEN_DB_URI: process.env.TOKEN_DB_URI ?? "",
   CUSTOM_ENCODING:

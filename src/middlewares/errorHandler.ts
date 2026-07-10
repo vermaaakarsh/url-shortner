@@ -1,4 +1,5 @@
 import { type ErrorRequestHandler } from "express";
+import logger from "../lib/logger";
 
 export const errorHandler: ErrorRequestHandler = (err: any, req, res, next) => {
   // Normalize status code: use provided numeric statusCode or default to 500
@@ -11,7 +12,7 @@ export const errorHandler: ErrorRequestHandler = (err: any, req, res, next) => {
 
   // Log server errors for debugging
   if (isServerError) {
-    console.error(err);
+    logger.error(err, err.message);
   }
 
   if (typeof err.statusCode === "number" && err.statusCode > 500) {
