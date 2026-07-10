@@ -20,7 +20,7 @@ export const errorHandler: ErrorRequestHandler = (err: any, req, res, next) => {
 
   return res.status(statusCode).json({
     success: false,
-    message: isServerError ? "Internal Server Error" : err?.message || "Error",
+    message: isServerError ? "Internal Server Error!" : err?.message || "Error",
     data: {},
   });
 };

@@ -12,7 +12,7 @@ export default async function getUniqueRandomToken(): Promise<bigint> {
 
   if (!randomRange) {
     let error = new CustomError(
-      "No available token ranges. Please try again later.",
+      "No available token ranges. Please try again later!",
     );
     error.statusCode = 503;
     throw error;
@@ -47,7 +47,7 @@ export default async function getUniqueRandomToken(): Promise<bigint> {
 
   if (!updated) {
     let error = new CustomError(
-      "Failed to update the token range. Please try again.",
+      "Failed to update the token range. Please try again!",
     );
     error.statusCode = 500;
     throw error;
