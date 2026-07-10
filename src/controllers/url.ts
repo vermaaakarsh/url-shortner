@@ -48,7 +48,7 @@ export const activateShortUrlController: RequestHandler = async (
 
     await activateShortUrl(shortCode);
     res
-      .status(204)
+      .status(200)
       .send({ success: true, message: "Short URL activated.", data: {} });
   } catch (error: any) {
     next(error);
@@ -72,7 +72,7 @@ export const deactivateShortUrlController: RequestHandler = async (
 
     await deactivateShortUrl(shortCode);
     res
-      .status(204)
+      .status(200)
       .send({ success: true, message: "Short URL deactivated.", data: {} });
   } catch (error: any) {
     next(error);
@@ -96,7 +96,7 @@ export const deleteShortUrlController: RequestHandler = async (
 
     await deleteShortUrl(shortCode);
     res
-      .status(204)
+      .status(200)
       .send({ success: true, message: "Short URL deleted.", data: {} });
   } catch (error: any) {
     next(error);

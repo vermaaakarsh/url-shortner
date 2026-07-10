@@ -1,4 +1,9 @@
-import { BadRequestError, CustomError, NotFoundError } from "../errors";
+import {
+  BadRequestError,
+  CustomError,
+  ForbiddenError,
+  NotFoundError,
+} from "../errors";
 import { urldb } from "../models/urldb";
 import { getEncodedShortUrl } from "../utils/encoding";
 import getUniqueRandomToken from "./token";
@@ -70,8 +75,15 @@ export const deleteShortUrl = async (shortCode: string): Promise<void> => {
 export const getOriginalUrl = async (shortCode: string): Promise<string> => {
   const { Url } = await urldb();
   const urlEntry = await Url.findOne({ shortCode, isDeleted: false });
+
   if (!urlEntry) {
     throw new NotFoundError("Short URL not found");
   }
+  if (!urlEntry.isActive) {
+    throw new ForbiddenError(
+      "This URL is no longer available. Kindly, contact the provider!",
+    );
+  }
+
   return urlEntry.originalUrl;
 };
