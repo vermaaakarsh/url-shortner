@@ -1,3 +1,4 @@
+import { CustomError } from "../errors";
 import { tokendb } from "../models/tokendb";
 
 export default async function getUniqueRandomToken(): Promise<bigint> {
@@ -10,7 +11,11 @@ export default async function getUniqueRandomToken(): Promise<bigint> {
   let randomRange = ranges[Math.floor(Math.random() * ranges.length)];
 
   if (!randomRange) {
-    throw new Error("No range available");
+    let error = new CustomError(
+      "No available token ranges. Please try again later.",
+    );
+    error.statusCode = 503;
+    throw error;
   }
 
   const updated = await Token.findOneAndUpdate(
@@ -41,7 +46,11 @@ export default async function getUniqueRandomToken(): Promise<bigint> {
   );
 
   if (!updated) {
-    throw new Error("Failed to fetch token. Please try again.");
+    let error = new CustomError(
+      "Failed to update the token range. Please try again.",
+    );
+    error.statusCode = 500;
+    throw error;
   }
   return updated.current;
 }

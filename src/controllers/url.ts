@@ -4,27 +4,35 @@ import {
   validateOriginalUrl,
   validateShortCode,
 } from "../validators/urlValidators";
+import { NotFoundError, UnprocessableEntityError } from "../errors";
 
-export const generateShortUrlController: RequestHandler = async (req, res) => {
+export const generateShortUrlController: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
   try {
     const { originalUrl } = req.body;
     if (!originalUrl || !validateOriginalUrl(originalUrl)) {
-      throw new Error("Valid original URL is required");
+      throw new UnprocessableEntityError("Valid URL is required");
     }
 
     const shortUrl = await generateShortUrl(originalUrl);
     res.status(200).send({
+      success: true,
       message: "Short URL generated successfully",
       data: { shortUrl },
     });
-  } catch (err: any) {
-    res.status(500).send({
-      message: err.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const getOriginalUrlController: RequestHandler = async (req, res) => {
+export const getOriginalUrlController: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
   try {
     const shortCodeParam = req.params.shortCode;
     const shortCode = Array.isArray(shortCodeParam)
@@ -32,16 +40,14 @@ export const getOriginalUrlController: RequestHandler = async (req, res) => {
       : shortCodeParam;
 
     if (!shortCode || !validateShortCode(shortCode)) {
-      return res.status(400).send({ message: "Valid short URL is required" });
+      throw new UnprocessableEntityError("Valid short URL is required");
     }
     const originalUrl: string | null = await getOriginalUrl(shortCode);
     if (!originalUrl) {
-      return res.status(404).send({ message: "Short URL not found" });
+      throw new NotFoundError("URL not found");
     }
     res.redirect(originalUrl);
-  } catch (err: any) {
-    res.status(500).send({
-      message: err.message,
-    });
+  } catch (error: any) {
+    next(error);
   }
 };
