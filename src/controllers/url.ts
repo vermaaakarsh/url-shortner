@@ -1,9 +1,6 @@
 import type { RequestHandler } from "express";
 import { generateShortUrl, getOriginalUrl } from "../services/url";
-import {
-  validateOriginalUrl,
-  validateShortCode,
-} from "../validators/urlValidators";
+import { validateShortCode } from "../validators/urlValidators";
 import { NotFoundError, UnprocessableEntityError } from "../errors";
 
 export const generateShortUrlController: RequestHandler = async (
@@ -13,7 +10,7 @@ export const generateShortUrlController: RequestHandler = async (
 ) => {
   try {
     const { originalUrl } = req.body;
-    if (!originalUrl || !validateOriginalUrl(originalUrl)) {
+    if (!originalUrl || !URL.canParse(originalUrl)) {
       throw new UnprocessableEntityError("Valid URL is required");
     }
 
