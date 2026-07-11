@@ -7,5 +7,6 @@ export const ENV = {
   CUSTOM_ENCODING:
     process.env.CUSTOM_ENCODING ??
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-  SHORT_URL_PREFIX: process.env.SHORT_URL_PREFIX ?? "http://localhost:3000/",
+  SHORT_URL_PREFIX: process.env.SHORT_URL_PREFIX ?? "",
+  CORS_ORIGIN: process.env.CORS_ORIGIN ?? "",
 };

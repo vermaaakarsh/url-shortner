@@ -1,6 +1,11 @@
 import express from "express";
 import routes from "./routers";
 import { ENV } from "./configs/env";
+import {
+  helmetMiddleware,
+  corsMiddleware,
+  compressionMiddleware,
+} from "./middlewares/security";
 import { errorHandler } from "./middlewares/errorHandler";
 import requestLogger from "./middlewares/requestLogger";
 import notFound from "./middlewares/notFound";
@@ -8,7 +13,15 @@ import { logApplicationInfo } from "./lib/logger/application";
 
 const app = express();
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "100kb",
+  }),
+);
+
+app.use(helmetMiddleware);
+app.use(corsMiddleware);
+app.use(compressionMiddleware);
 
 app.use(requestLogger);
 
