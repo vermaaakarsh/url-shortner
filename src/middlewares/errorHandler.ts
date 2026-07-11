@@ -1,5 +1,8 @@
 import { type ErrorRequestHandler } from "express";
-import logger from "../lib/logger";
+import {
+  logApplicationError,
+  logApplicationWarn,
+} from "../lib/logger/application";
 
 export const errorHandler: ErrorRequestHandler = (err: any, req, res, next) => {
   // Normalize status code: use provided numeric statusCode or default to 500
@@ -10,9 +13,30 @@ export const errorHandler: ErrorRequestHandler = (err: any, req, res, next) => {
 
   const isServerError = statusCode >= 500;
 
-  // Log server errors for debugging
+  // Log errors with request context
   if (isServerError) {
-    logger.error(err, err.message);
+    logApplicationError(
+      err,
+      {
+        event: "error",
+        statusCode,
+        path: req.path,
+        method: req.method,
+      },
+      req.logger,
+    );
+  } else {
+    logApplicationWarn(
+      err?.message || "Error",
+      {
+        event: "error",
+        statusCode,
+        path: req.path,
+        method: req.method,
+        message: err?.message,
+      },
+      req.logger,
+    );
   }
 
   if (typeof err.statusCode === "number" && err.statusCode > 500) {

@@ -8,6 +8,7 @@ import {
 } from "../services/url";
 import { validateShortCode } from "../validators/urlValidators";
 import { NotFoundError, UnprocessableEntityError } from "../errors";
+import { logApplicationInfo } from "../lib/logger/application";
 
 export const generateShortUrlController: RequestHandler = async (
   req,
@@ -21,6 +22,17 @@ export const generateShortUrlController: RequestHandler = async (
     }
 
     const shortUrl = await generateShortUrl(originalUrl);
+
+    logApplicationInfo(
+      "Short URL created successfully",
+      {
+        event: "url_created",
+        shortUrl,
+        originalUrl,
+      },
+      req.logger,
+    );
+
     res.status(201).send({
       success: true,
       message: "Short URL generated successfully.",
@@ -47,6 +59,16 @@ export const activateShortUrlController: RequestHandler = async (
     }
 
     await activateShortUrl(shortCode);
+
+    logApplicationInfo(
+      "Short URL activated",
+      {
+        event: "url_activated",
+        shortCode,
+      },
+      req.logger,
+    );
+
     res
       .status(200)
       .send({ success: true, message: "Short URL activated.", data: {} });
@@ -71,6 +93,16 @@ export const deactivateShortUrlController: RequestHandler = async (
     }
 
     await deactivateShortUrl(shortCode);
+
+    logApplicationInfo(
+      "Short URL deactivated",
+      {
+        event: "url_deactivated",
+        shortCode,
+      },
+      req.logger,
+    );
+
     res
       .status(200)
       .send({ success: true, message: "Short URL deactivated.", data: {} });
@@ -95,6 +127,16 @@ export const deleteShortUrlController: RequestHandler = async (
     }
 
     await deleteShortUrl(shortCode);
+
+    logApplicationInfo(
+      "Short URL deleted",
+      {
+        event: "url_deleted",
+        shortCode,
+      },
+      req.logger,
+    );
+
     res
       .status(200)
       .send({ success: true, message: "Short URL deleted.", data: {} });
@@ -121,6 +163,17 @@ export const getOriginalUrlController: RequestHandler = async (
     if (!originalUrl) {
       throw new NotFoundError("URL not found!");
     }
+
+    logApplicationInfo(
+      "Redirecting to original URL",
+      {
+        event: "redirect",
+        shortCode,
+        targetUrl: originalUrl,
+      },
+      req.logger,
+    );
+
     res.status(302).redirect(originalUrl);
   } catch (error: any) {
     next(error);
