@@ -5,6 +5,7 @@ import {
   logApplicationWarn,
   logApplicationError,
 } from "../logger/application";
+import { CONNECTION_STATUS } from "../../constants";
 
 class MongoManager {
   private static instance: MongoManager;
@@ -12,6 +13,11 @@ class MongoManager {
   private readonly connections = new Map<
     keyof typeof mongoConfigs,
     Promise<Connection>
+  >();
+
+  private readonly activeConnections = new Map<
+    keyof typeof mongoConfigs,
+    Connection
   >();
 
   private constructor() {}
@@ -39,6 +45,8 @@ class MongoManager {
 
     connectionPromise
       .then((conn) => {
+        this.activeConnections.set(name, conn);
+
         logApplicationInfo(`Successfully connected to ${name} database`, {
           event: "db_connection_success",
           dbName: name,
@@ -59,6 +67,8 @@ class MongoManager {
         });
       })
       .catch((err: Error) => {
+        this.connections.delete(name);
+
         logApplicationError(err, {
           event: "db_connection_failed",
           dbName: name,
@@ -68,6 +78,36 @@ class MongoManager {
     this.connections.set(name, connectionPromise);
 
     return connectionPromise;
+  }
+
+  getConnectionStatus() {
+    const status: Record<string, string> = {};
+
+    for (const name of Object.keys(mongoConfigs) as Array<
+      keyof typeof mongoConfigs
+    >) {
+      const connection = this.activeConnections.get(name);
+
+      if (!connection) {
+        status[name] = CONNECTION_STATUS.IDLE;
+        continue;
+      }
+
+      switch (connection.readyState) {
+        case 1:
+          status[name] = CONNECTION_STATUS.CONNECTED;
+          break;
+
+        case 2:
+          status[name] = CONNECTION_STATUS.CONNECTING;
+          break;
+
+        default:
+          status[name] = CONNECTION_STATUS.DISCONNECTED;
+      }
+    }
+
+    return status;
   }
 }
 

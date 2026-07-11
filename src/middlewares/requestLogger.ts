@@ -10,9 +10,10 @@ const requestLogger: RequestHandler = (req, res, next) => {
   const requestId = crypto.randomUUID();
   const childLogger = createRequestLogger(requestId);
 
-  (req as any).id = requestId;
-  (req as any).logger = childLogger;
+  req.id = requestId;
+  req.logger = childLogger;
   res.locals.requestId = requestId;
+  res.setHeader("X-Request-ID", requestId);
 
   const startTime = process.hrtime.bigint();
 

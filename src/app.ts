@@ -11,17 +11,6 @@ app.use(express.json());
 
 app.use(requestLogger);
 
-app.get("/health", (req, res) => {
-  logApplicationInfo(
-    "Health check requested",
-    {
-      event: "health_check",
-    },
-    req.logger,
-  );
-  res.send({ success: true, message: "Server Working!", data: {} });
-});
-
 app.use("/", routes);
 
 app.use(errorHandler);

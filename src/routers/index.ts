@@ -1,18 +1,10 @@
-import express from "express";
-import {
-  generateShortUrlController,
-  activateShortUrlController,
-  deactivateShortUrlController,
-  deleteShortUrlController,
-  getOriginalUrlController,
-} from "../controllers/url";
+import { Router } from "express";
+import healthRoutes from "./health";
+import urlRoutes from "./url";
 
-const router: express.Router = express.Router();
+const router: Router = Router();
 
-router.post("/url", generateShortUrlController);
-router.patch("/:shortCode/activate", activateShortUrlController);
-router.patch("/:shortCode/deactivate", deactivateShortUrlController);
-router.delete("/:shortCode", deleteShortUrlController);
-router.get("/:shortCode", getOriginalUrlController);
+router.use("/health", healthRoutes);
+router.use("/", urlRoutes);
 
 export default router;
