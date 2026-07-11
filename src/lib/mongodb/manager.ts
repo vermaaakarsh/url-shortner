@@ -109,6 +109,25 @@ class MongoManager {
 
     return status;
   }
+
+  async disconnect() {
+    logApplicationInfo("Closing all MongoDB connections...", {
+      event: "db_disconnect_started",
+    });
+
+    await Promise.all(
+      [...this.activeConnections.values()].map((connection) =>
+        connection.close(),
+      ),
+    );
+
+    this.activeConnections.clear();
+    this.connections.clear();
+
+    logApplicationInfo("All MongoDB connections closed.", {
+      event: "db_disconnect_completed",
+    });
+  }
 }
 
 export default MongoManager.getInstance();
